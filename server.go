@@ -43,7 +43,17 @@ func home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func marshalBar(struc []Bar) (btyes []byte) {
+func marshalBars(struc []Bar) (btyes []byte) {
+	b, err := json.Marshal(struc)
+	fmt.Println(struc)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+//TODO combine with above?
+func marshalBar(struc Bar) (btyes []byte) {
 	b, err := json.Marshal(struc)
 	fmt.Println(struc)
 	if err != nil {
