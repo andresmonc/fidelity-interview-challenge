@@ -3,17 +3,18 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"encoding/json"
 )
 
 type Bar struct {
-	uuid int `json:"uuid"`
-	bar  int `json:"bar"`
+	Uuid string `json:"uuid"`
+	Bar  string `json:"bar"`
 }
 
 // acting as database
 var Bars = []Bar{
-	Bar{uuid: 123, bar: 13},
-	Bar{uuid: 123, bar: 2},
+	Bar{Uuid: "123", Bar: "13"},
+	Bar{Uuid: "1233", Bar: "2"},
 }
 
 func main() {
@@ -33,19 +34,28 @@ func home(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "GET":
+		response := marshalBar(Bars)
         w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "get called"}`))
+		w.Write(response)
 	default:
         w.WriteHeader(http.StatusNotFound)
         w.Write([]byte(`{"message": "not found"}`))
 	}
 }
 
+func marshalBar(struc []Bar) (btyes []byte) {
+	b, err := json.Marshal(struc)
+	fmt.Println(struc)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
 
-func  getBarById(id int) (bar Bar){
+func  getBarByID(id string) (bar Bar){
 	for i := 0; i < len(Bars); i++ {
 		currentBar := Bars[i]
-		if currentBar.uuid == id {
+		if currentBar.Uuid == id {
 			return currentBar
 		}
 	}
