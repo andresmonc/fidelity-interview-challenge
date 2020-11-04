@@ -20,7 +20,7 @@ var Bars = []Bar{
 func main() {
 	port := "8080"
 	fmt.Printf("Starting server at port %s", port)
-	http.HandleFunc("/", home)
+	http.HandleFunc("/foo", home)
 	startServer(port)
 }
 
@@ -34,7 +34,7 @@ func home(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "GET":
-		response := marshalBar(Bars)
+		response := marshalBars(Bars)
         w.WriteHeader(http.StatusOK)
 		w.Write(response)
 	default:
