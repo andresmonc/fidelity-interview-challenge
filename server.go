@@ -47,7 +47,12 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 		if routeParam == "sum" {
 			response = []byte(`{"sum":` + fmt.Sprint(sumBar()) + `}`)
 		} else if routeParam != "" {
-			response = marshalBar(getBarByID(routeParam))
+			var bar Bar = getBarByID(routeParam)
+			if bar.Uuid == "" {
+				response = ([]byte(`{"message": "not found"}`))
+			} else {
+				response = marshalBar(getBarByID(routeParam))
+			}
 		} else {
 			response = marshalBars(barsData)
 		}
@@ -75,7 +80,6 @@ func marshalBars(struc Bars) (btyes []byte) {
 	return b
 }
 
-//TODO combine with above?
 func marshalBar(struc Bar) (btyes []byte) {
 	b, err := json.Marshal(struc)
 	isErrPanic(err)
