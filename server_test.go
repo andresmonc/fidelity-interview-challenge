@@ -24,5 +24,4 @@ func Test_generateUUID(t *testing.T) {
 func Test_deleteBarByID(t *testing.T) {
 	assertTrue(deleteBarByID("") == "not found")
 	assertTrue(deleteBarByID("223456789") == "Success")
-
 }
