@@ -37,15 +37,17 @@ func Test_getBarByID(t *testing.T) {
 	assertEquals(99, getBarByID("123456789").Bar)
 }
 
-func Test_marshalBar(t *testing.T){
+func Test_marshalBar(t *testing.T) {
 	marshalBar(barsData.Bars[0])
 }
 
-func Test_marshalBars(t *testing.T){
+func Test_marshalBars(t *testing.T) {
 	marshalBars(barsData)
 }
 
-
-func Test_unMarshalBars(t *testing.T){
-	// unMarshalBar()
+func Test_unMarshalBars(t *testing.T) {
+	bar := Bar{UUID: "223456789", Bar: 1}
+	bytes := marshalBar(bar)
+	newBar := unMarshalBar([]byte(bytes))
+	assertEquals(1, newBar.Bar)
 }
