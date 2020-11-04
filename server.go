@@ -58,11 +58,11 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 		isErrPanic(err)
 		uuid := addNewBar(unMarshalBar(b))
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"id": ` + uuid + `}`))
+		w.Write([]byte(`{"id": "` + uuid + `"}`))
 	case "DELETE":
-		deleteBarByID(routeParam)
+		msg := deleteBarByID(routeParam)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "found but not working"}`))
+		w.Write([]byte(`{"message": "` + msg + `"}`))
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{"message": "not found"}`))
@@ -118,18 +118,21 @@ func sumBar() int {
 	return sum
 }
 
-func deleteBarByID(id string) {
+func deleteBarByID(id string) string {
 	indexForID := -1
-	fmt.Println(indexForID)
 	for i := 0; i < len(barsData.Bars); i++ {
 		currentBar := barsData.Bars[i]
 		if currentBar.Uuid == id {
 			indexForID = i
 		}
 	}
-	fmt.Println(indexForID)
-	barsData.Bars[indexForID] = barsData.Bars[len(barsData.Bars)-1] //copy last element to index
-	barsData.Bars = barsData.Bars[:len(barsData.Bars)-1]            // remove last element
+	if indexForID != -1 {
+		barsData.Bars[indexForID] = barsData.Bars[len(barsData.Bars)-1] //copy last element to index
+		barsData.Bars = barsData.Bars[:len(barsData.Bars)-1]            // remove last element
+		return "Success"
+	}
+	return "not found"
+
 }
 
 func getBarByID(id string) (bar Bar) {
