@@ -1,23 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
-var mockBar = Bars{
-	Bars: []Bar{
-		Bar{UUID: generateUUID(), Bar: 99},
-		Bar{UUID: generateUUID(), Bar: 1},
-	},
+func init() {
+	barsData = Bars{
+		Bars: []Bar{
+			Bar{UUID: "123456789", Bar: 99},
+			Bar{UUID: "223456789", Bar: 1},
+		},
+	}
 }
 
 func Test_sumBar(t *testing.T) {
-	assertEquals(100, sumBar(mockBar))
+	assertEquals(100, sumBar())
 }
 
-func assertEquals(expected int, actual int) {
-	if expected != actual {
-		panic(fmt.Sprintf("%d not equal %d", expected, actual))
-	}
+func Test_generateUUID(t *testing.T) {
+	assertEquals(len(generateUUID()), 32)
+}
+
+func Test_deleteBarByID(t *testing.T) {
+	assertTrue(deleteBarByID("") == "not found")
+	assertTrue(deleteBarByID("223456789") == "not found")
+
 }

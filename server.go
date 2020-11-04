@@ -50,7 +50,7 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		var response []byte
 		if routeParam == "sum" {
-			response = []byte(`{"sum":` + fmt.Sprint(sumBar(barsData)) + `}`)
+			response = []byte(`{"sum":` + fmt.Sprint(sumBar()) + `}`)
 		} else if routeParam != "" {
 			var bar Bar = getBarByID(routeParam)
 			if bar.UUID == "" {
@@ -119,10 +119,10 @@ func generateUUID() string {
 
 }
 
-func sumBar(bars Bars) int {
+func sumBar() int {
 	sum := 0
-	for i := 0; i < len(bars.Bars); i++ {
-		sum += bars.Bars[i].Bar
+	for i := 0; i < len(barsData.Bars); i++ {
+		sum += barsData.Bars[i].Bar
 	}
 	return sum
 }
