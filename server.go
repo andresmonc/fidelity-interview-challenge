@@ -119,15 +119,17 @@ func sumBar() int {
 }
 
 func deleteBarByID(id string) {
-	var indexForID int
+	indexForID := -1
+	fmt.Println(indexForID)
 	for i := 0; i < len(barsData.Bars); i++ {
 		currentBar := barsData.Bars[i]
 		if currentBar.Uuid == id {
 			indexForID = i
 		}
 	}
+	fmt.Println(indexForID)
 	barsData.Bars[indexForID] = barsData.Bars[len(barsData.Bars)-1] //copy last element to index
-	barsData.Bars = barsData.Bars[:len(barsData.Bars)-1] // remove last element
+	barsData.Bars = barsData.Bars[:len(barsData.Bars)-1]            // remove last element
 }
 
 func getBarByID(id string) (bar Bar) {
