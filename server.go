@@ -9,19 +9,24 @@ import (
 	"strings"
 )
 
+// Bar represents a bar
 type Bar struct {
-	Uuid string `json:"uuid"`
-	Bar  int    `json:"bar"`
+	// UUID represents unique ID for each bar
+	UUID string `json:"UUID"`
+	// Bar represents the amount of bars
+	Bar int `json:"bar"`
 }
 
+// Bars represents a collection of bars
 type Bars struct {
+	// Bars represents an array of bars
 	Bars []Bar `json:"bars"`
 }
 
 var barsData = Bars{
 	Bars: []Bar{
-		Bar{Uuid: generateUUID(), Bar: 12},
-		Bar{Uuid: generateUUID(), Bar: 14},
+		Bar{UUID: generateUUID(), Bar: 12},
+		Bar{UUID: generateUUID(), Bar: 14},
 	},
 }
 
@@ -48,7 +53,7 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 			response = []byte(`{"sum":` + fmt.Sprint(sumBar()) + `}`)
 		} else if routeParam != "" {
 			var bar Bar = getBarByID(routeParam)
-			if bar.Uuid == "" {
+			if bar.UUID == "" {
 				response = ([]byte(`{"message": "not found"}`))
 			} else {
 				response = marshalBar(getBarByID(routeParam))
@@ -61,9 +66,9 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		b, err := ioutil.ReadAll(r.Body)
 		isErrPanic(err)
-		uuid := addNewBar(unMarshalBar(b))
+		UUID := addNewBar(unMarshalBar(b))
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"id": "` + uuid + `"}`))
+		w.Write([]byte(`{"id": "` + UUID + `"}`))
 	case "DELETE":
 		msg := deleteBarByID(routeParam)
 		w.WriteHeader(http.StatusOK)
@@ -95,9 +100,9 @@ func unMarshalBar(bytes []byte) (bar Bar) {
 }
 
 func addNewBar(bar Bar) string {
-	bar.Uuid = generateUUID()
+	bar.UUID = generateUUID()
 	barsData.Bars = append(barsData.Bars, bar)
-	return bar.Uuid
+	return bar.UUID
 }
 
 func isErrPanic(err error) {
@@ -126,7 +131,7 @@ func deleteBarByID(id string) string {
 	indexForID := -1
 	for i := 0; i < len(barsData.Bars); i++ {
 		currentBar := barsData.Bars[i]
-		if currentBar.Uuid == id {
+		if currentBar.UUID == id {
 			indexForID = i
 		}
 	}
@@ -142,7 +147,7 @@ func deleteBarByID(id string) string {
 func getBarByID(id string) (bar Bar) {
 	for i := 0; i < len(barsData.Bars); i++ {
 		currentBar := barsData.Bars[i]
-		if currentBar.Uuid == id {
+		if currentBar.UUID == id {
 			return currentBar
 		}
 	}
