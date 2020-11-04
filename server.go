@@ -4,14 +4,14 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type Bar struct {
 	Uuid string `json:"uuid"`
-	Bar  string `json:"bar"`
+	Bar  int    `json:"bar"`
 }
 
 type Bars struct {
@@ -20,8 +20,8 @@ type Bars struct {
 
 var barsData = Bars{
 	Bars: []Bar{
-		Bar{Uuid: generateUUID(), Bar: "13"},
-		Bar{Uuid: generateUUID(), Bar: "2"},
+		Bar{Uuid: generateUUID(), Bar: 12},
+		Bar{Uuid: generateUUID(), Bar: 14},
 	},
 }
 
@@ -40,12 +40,14 @@ func startServer(port string) {
 
 func fooBar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	id := strings.TrimPrefix(r.URL.Path,"/foo/")
+	routeParam := strings.TrimPrefix(r.URL.Path, "/foo/")
 	switch r.Method {
 	case "GET":
 		var response []byte
-		if(id != ""){
-			response = marshalBar(getBarByID(id))
+		if routeParam == "sum" {
+			response = []byte(`{"sum":` + fmt.Sprint(sumBar()) + `}`)
+		} else if routeParam != "" {
+			response = marshalBar(getBarByID(routeParam))
 		} else {
 			response = marshalBars(barsData)
 		}
@@ -57,7 +59,9 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 		uuid := addNewBar(unMarshalBar(b))
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"id": ` + uuid + `}`))
-
+	case "DELETE":
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "found but not working"}`))
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{"message": "not found"}`))
@@ -103,6 +107,14 @@ func generateUUID() string {
 	isErrPanic(err)
 	return fmt.Sprintf("%x", b)
 
+}
+
+func sumBar() int {
+	sum := 0
+	for i := 0; i < len(barsData.Bars); i++ {
+		sum += barsData.Bars[i].Bar
+	}
+	return sum
 }
 
 func getBarByID(id string) (bar Bar) {
