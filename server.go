@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"crypto/rand"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
 type Bar struct {
@@ -11,10 +13,15 @@ type Bar struct {
 	Bar  string `json:"bar"`
 }
 
-// acting as database
-var Bars = []Bar{
-	Bar{Uuid: "123", Bar: "13"},
-	Bar{Uuid: "1233", Bar: "2"},
+type Bars struct {
+	Bars []Bar `json:"bars"`
+}
+
+var barsData = Bars{
+	Bars: []Bar{
+		Bar{Uuid: generateUUID(), Bar: "13"},
+		Bar{Uuid: generateUUID(), Bar: "2"},
+	},
 }
 
 func main() {
@@ -31,40 +38,70 @@ func startServer(port string) {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "GET":
-		response := marshalBars(Bars)
-        w.WriteHeader(http.StatusOK)
+		response := marshalBars(barsData)
+		w.WriteHeader(http.StatusOK)
 		w.Write(response)
+	case "POST":
+		b, err := ioutil.ReadAll(r.Body)
+		isErrPanic(err)
+		uuid := addNewBar(unMarshalBar(b))
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"id": `+ uuid + `}`))
+
 	default:
-        w.WriteHeader(http.StatusNotFound)
-        w.Write([]byte(`{"message": "not found"}`))
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"message": "not found"}`))
 	}
 }
 
-func marshalBars(struc []Bar) (btyes []byte) {
+func marshalBars(struc Bars) (btyes []byte) {
 	b, err := json.Marshal(struc)
-	fmt.Println(struc)
-	if err != nil {
-		panic(err)
-	}
+	isErrPanic(err)
 	return b
 }
 
 //TODO combine with above?
 func marshalBar(struc Bar) (btyes []byte) {
 	b, err := json.Marshal(struc)
-	fmt.Println(struc)
-	if err != nil {
-		panic(err)
-	}
+	isErrPanic(err)
 	return b
 }
 
-func  getBarByID(id string) (bar Bar){
-	for i := 0; i < len(Bars); i++ {
-		currentBar := Bars[i]
+func unMarshalBar(bytes []byte) (bar Bar) {
+	err := json.Unmarshal(bytes, &bar)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return bar
+}
+
+func addNewBar(bar Bar) string{
+	bar.Uuid = generateUUID()
+	barsData.Bars = append(barsData.Bars, bar)
+	return bar.Uuid
+}
+
+func isErrPanic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func generateUUID() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	isErrPanic(err)
+	return fmt.Sprintf("%x", b)
+
+}
+
+func getBarByID(id string) (bar Bar) {
+	barsArray := barsData.Bars
+	for i := 0; i < len(barsData.Bars); i++ {
+		currentBar := barsArray[i]
 		if currentBar.Uuid == id {
 			return currentBar
 		}
