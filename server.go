@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"io/ioutil"
 	"net/http"
 )
@@ -27,7 +28,7 @@ var barsData = Bars{
 func main() {
 	port := "8080"
 	fmt.Printf("Starting server at port %s", port)
-	http.HandleFunc("/foo", home)
+	http.HandleFunc("/foo/", fooBar)
 	startServer(port)
 }
 
@@ -37,11 +38,17 @@ func startServer(port string) {
 	}
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
+func fooBar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	id := strings.TrimPrefix(r.URL.Path,"/foo/")
 	switch r.Method {
 	case "GET":
-		response := marshalBars(barsData)
+		var response []byte
+		if(id != ""){
+			response = marshalBar(getBarByID(id))
+		} else {
+			response = marshalBars(barsData)
+		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(response)
 	case "POST":
@@ -49,7 +56,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 		isErrPanic(err)
 		uuid := addNewBar(unMarshalBar(b))
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"id": `+ uuid + `}`))
+		w.Write([]byte(`{"id": ` + uuid + `}`))
 
 	default:
 		w.WriteHeader(http.StatusNotFound)
@@ -78,7 +85,7 @@ func unMarshalBar(bytes []byte) (bar Bar) {
 	return bar
 }
 
-func addNewBar(bar Bar) string{
+func addNewBar(bar Bar) string {
 	bar.Uuid = generateUUID()
 	barsData.Bars = append(barsData.Bars, bar)
 	return bar.Uuid
