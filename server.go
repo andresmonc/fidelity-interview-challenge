@@ -60,6 +60,7 @@ func fooBar(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"id": ` + uuid + `}`))
 	case "DELETE":
+		deleteBarByID(routeParam)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "found but not working"}`))
 	default:
@@ -117,10 +118,21 @@ func sumBar() int {
 	return sum
 }
 
-func getBarByID(id string) (bar Bar) {
-	barsArray := barsData.Bars
+func deleteBarByID(id string) {
+	var indexForID int
 	for i := 0; i < len(barsData.Bars); i++ {
-		currentBar := barsArray[i]
+		currentBar := barsData.Bars[i]
+		if currentBar.Uuid == id {
+			indexForID = i
+		}
+	}
+	barsData.Bars[indexForID] = barsData.Bars[len(barsData.Bars)-1] //copy last element to index
+	barsData.Bars = barsData.Bars[:len(barsData.Bars)-1] // remove last element
+}
+
+func getBarByID(id string) (bar Bar) {
+	for i := 0; i < len(barsData.Bars); i++ {
+		currentBar := barsData.Bars[i]
 		if currentBar.Uuid == id {
 			return currentBar
 		}
