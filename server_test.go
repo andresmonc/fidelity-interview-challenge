@@ -25,3 +25,7 @@ func Test_deleteBarByID(t *testing.T) {
 	assertTrue(deleteBarByID("") == "not found")
 	assertTrue(deleteBarByID("223456789") == "Success")
 }
+
+func Test_getBarByID(t *testing.T) {
+	assertEquals(99, getBarByID("123456789").Bar)
+}

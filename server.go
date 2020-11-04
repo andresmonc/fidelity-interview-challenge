@@ -23,6 +23,7 @@ type Bars struct {
 	Bars []Bar `json:"bars"`
 }
 
+// Acting as Database
 var barsData = Bars{
 	Bars: []Bar{
 		Bar{UUID: generateUUID(), Bar: 12},
